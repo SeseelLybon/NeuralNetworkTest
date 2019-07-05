@@ -31,6 +31,7 @@ public class MeepleBahaviourScript : MonoBehaviour
     void Start()
     {
         WAIS = GameObject.Find("World_AI").GetComponent<GeneralBehaviourScript>();
+        brain = gameObject.GetComponent<NeuralNetwork>();
 
         hunger = random.Next(0,30);
         happiness = random.Next(25, 75);
@@ -38,19 +39,7 @@ public class MeepleBahaviourScript : MonoBehaviour
         food_sell_willingnes = random.Next(0, 9); // demand 10 food to be x gold to sell
         food_buy_willingnes = random.Next(1, 9); // demand to get x food for 10 gold
 
-        List<string> inputs = new List<string>();
-        List<string> outputs = new List<string>();
 
-        inputs.Add("Food Reserves");
-        inputs.Add("Hunger");
-        inputs.Add("Age");
-
-        outputs.Add("Go eat");
-        outputs.Add("Do nothing");
-        outputs.Add("Gather");
-
-        print("");
-        brain = new NeuralNetwork( inputs, outputs );
     }
 
     // Update is called once per frame
@@ -61,19 +50,18 @@ public class MeepleBahaviourScript : MonoBehaviour
         age += 0.25f;
 
         // 1. Set inputs
-        brain.Set_input_node_intensity("Food Reserves", food_reserves);
-        brain.Set_input_node_intensity("Hunger", hunger);
-        brain.Set_input_node_intensity("Ages", age);
+        brain.set_input_intensity(0, food_reserves);
+        brain.set_input_intensity(1, hunger);
 
         // 2. Fire network
-        brain.Fire_Network();
+        brain.Fire_network();
 
         // 3. Get outputs
-        if( brain.get_output_node_intensity("Go eat") >= 0.8)
+        if( brain.get_output_intensity(0) >= 0.8)
         {
             consume_meal();
         }
-        if( brain.get_output_node_intensity("Gather") >= 0.8)
+        if( brain.get_output_intensity(0) >= 0.8)
         {
             gather_food();
         }

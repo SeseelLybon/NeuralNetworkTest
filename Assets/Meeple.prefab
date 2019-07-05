@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4111033999277549315}
   - component: {fileID: 4111033999277549324}
+  - component: {fileID: 8686144555778677692}
   m_Layer: 0
   m_Name: Meeple
   m_TagString: Untagged
@@ -56,3 +57,37 @@ MonoBehaviour:
   hunger: 0
   happiness: 50
   age: 0
+--- !u!114 &8686144555778677692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4111033999277549314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26820c1416ef7d64ba6ac41fe77a416e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  input_layer:
+  - bias: 0
+    intensity: 0
+    weights: []
+    has_changed: 0
+  - bias: 0
+    intensity: 0
+    weights: []
+    has_changed: 0
+  output_layer:
+  - bias: 0
+    intensity: 0
+    weights:
+    - 1
+    - 1
+    has_changed: 0
+  - bias: 0
+    intensity: 0
+    weights:
+    - 1
+    - 1
+    has_changed: 0
