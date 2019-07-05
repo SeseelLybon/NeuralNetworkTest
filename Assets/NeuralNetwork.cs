@@ -1,153 +1,148 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-public class NeuralNetwork{
+/// <summary>
+/// 
+/// Usage;
+///     1. construct
+///     2. set all inputs
+///     3. fire network
+///     4. get inputs
+///     5. repeat from 2
+///     
+/// </summary>
+public class NeuralNetwork
+{
 
     Node_Layer input_layer;
-    List<Node_Layer> hidden_layers;
+    //List<Node_Layer> hidden_layers;
     Node_Layer output_layer;
 
-    readonly int amount_hidden_layers; // Doesn't need to have any layers (but it's probably wrong if it doesn't have any)
-    readonly int amount_input_nodes; // Always has at least 1 node
-    readonly int amount_output_nodes; // Always has at least 1 node
-
     // needs overloads
-    NeuralNetwork(List<string> inputs, List<string> outputs, int hid_lyr = 0)
+    NeuralNetwork(List<string> inputs, List<string> outputs)
     {
-        amount_hidden_layers = hid_lyr;
+
+        // Generate from input to output so you can pass parent layers.
+
+        // Generate input layer
+        input_layer = new Node_Layer(inputs);
+
+        // Generate output layer
+        // PASS PARENT LAYERS!
+
+        output_layer = new Node_Layer(outputs, input_layer,  true);
 
 
     }
 
-    // Depricated atm, needs a bit of rewriting. Like get_intensity, but does nothing.
+
+    // Fire the entire network from the output nodes
     void Fire_Network()
     {
-        // Fire the entire network from the output nodes
-
         // Tell each node not on the input layer it's old
-
         output_layer.Invalidate();
-        if(hidden_layers != null)
-        {
-            foreach (Node_Layer nd_lyer in hidden_layers)
-            {
-                nd_lyer.Invalidate();
-            }
-        }
+        // invalidate old layers
 
         // go through all non-input layer nodes and generate new intensities
         // Because the function is recursive, only need to ask the output layer
-
-        foreach(KeyValuePair<string,Node> nodepair in output_layer.nodes)
-        {
-            nodepair.Value.get_intensity();
-        }
-
-        // 
+        output_layer.Fire_nodes();
     }
 
-    public double[] get_output()
+    public double get_output_node(string node_name)
     {
-        // prep return array
-        double[] temp = new double[amount_output_nodes];
-
-        // tell the network it's values are considered old
-        output_layer.Invalidate();
-        foreach (Node_Layer nd_lyer in hidden_layers)
-        {
-            nd_lyer.Invalidate();
-        }
-
-        // convert the output_layer to double array
-        for (int i =0; i< amount_output_nodes; i++)
-        {
-            temp[i] = output_layer.nodes[i].get_intensity() ;
-        }
-
+        double temp = output_layer.nodes[node_name].get_intensity();
         return temp;
     }
 }
 
+//---------------------------------------------NODE LAYER
 public class Node_Layer
 {
-    public Dictionary<string, Node> nodes;
+    public Dictionary<string, Node> nodes;              // Name; Node
 
-    // input layer without weights
-    public Node_Layer( List<string> input_names )
+    // Can be null!
+    public Node_Layer parent_layer;
+
+    bool is_input_layer = false;
+    bool is_output_layer = false;
+
+    // Should only be called for input layers!
+    public Node_Layer(List<string> node_names)
     {
-        foreach( string name in input_names)
+        is_input_layer = true;
+        foreach (string name in node_names)
         {
             nodes.Add( name, new Node() );
         }
     }
 
-    // Used if hidden layer or output layer
-    public Node_Layer()
+    // Can be called for any layer
+    public Node_Layer(List<string> node_names, Node_Layer parentlayer, bool isoutptlyer)
     {
-        //
+        parent_layer = parentlayer;
+        is_output_layer = isoutptlyer;
 
+        foreach (string name in node_names)
+        {
+            nodes.Add(name, new Node());
+        }
     }
 
     // Tells all nodes in this layer that they're old and need to be regenerated when asked thier intensity
     public void Invalidate()
     {
-        foreach(KeyValuePair<string,Node> nodepair in nodes)
+        foreach (KeyValuePair<string, Node> nodepair in nodes)
         {
             nodepair.Value.intensity_is_new = false;
         }
     }
+
+    public void Fire_nodes()
+    {
+
+    }
 }
 
+//---------------------------------------------NODE
+/// <summary>
+/// Node mostly exists for data storage
+/// </summary>
 public class Node
 {
     public readonly double bias;
+    public Node_Layer parent_layer;
+    public Dictionary<string, double> parent_nodes_weights;
 
     double intensity = 0;
     public bool intensity_is_new = false;
 
-    bool is_input; // if this layer doesn't have nodes as parent, but an input
-
-    // Don't use external inputs yet. Input has to tell value to Node as for now.
-    // bool has_extern_input;
-    // int *extern_input;
-
-    public Dictionary<Node,  double> parents; // parent, weight; can be empty!
-
-
+    bool is_input = false;
+    bool is_output = false;
 
     // Blank constructor, used for input layer
-    public Node()
+    public Node(double bias = 0)
     {
         is_input = true;
+        this.bias = bias;
+        // because there are no parents, there are no weights
     }
 
-    // Have parents, but no weights to set
-    public Node( List<Node> prnts, double bias = 0 )
+    // Have parents, no weights
+    public Node(Node_Layer parent, double bias = 0, bool isoutpt = false)
     {
         this.bias = bias;
-        foreach(Node node in prnts ) {
-            parents.Add(node, 1d);
-        }
-    }
+        is_output = isoutpt;
 
-    // Have parents and weights
-    public Node(List<KeyValuePair<Node, int>> prnts, double bias = 0)
-    {
-        this.bias = bias;
-        foreach (KeyValuePair<Node, int> node in prnts)
+        parent_layer = parent;
+        // give each node a weight of 1 since we haven't got any passed
+        foreach(KeyValuePair<string, Node> nodepair in parent_layer.nodes)
         {
-            parents.Add(node.Key, node.Value);
+            parent_nodes_weights.Add(nodepair.Key, 1d);
         }
     }
 
-    // RECURSIVE
     public double get_intensity()
     {
-        if(intensity_is_new == false)
-        {
-            activate_node();
-            intensity_is_new = true;
-        }
         return intensity;
     }
 
@@ -163,6 +158,7 @@ public class Node
         }
     }
 
+    // RECURSIVE
     void activate_node()
     {
         if(is_input) {
@@ -170,11 +166,16 @@ public class Node
         } else
         {
             double temp_intens = 0;
-            foreach (KeyValuePair<Node, double> entry in parents)
+            foreach (KeyValuePair<string, double> entry in parent_nodes_weights)
             {
-                temp_intens += entry.Key.get_intensity() * entry.Value;
+                if (parent_layer.nodes[entry.Key].intensity_is_new == false)
+                {
+                    parent_layer.nodes[entry.Key].activate_node();
+                }
+                temp_intens += parent_layer.nodes[entry.Key].get_intensity() * entry.Value;
             }
             intensity = Sigmoid(temp_intens + bias);
+            intensity_is_new = true;
         }
     }
 
