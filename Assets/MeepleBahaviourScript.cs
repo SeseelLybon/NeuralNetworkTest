@@ -6,6 +6,7 @@ public class MeepleBahaviourScript : MonoBehaviour
 {
     private GeneralBehaviourScript WAIS;
 
+    public NeuralNetwork brain;
 
     public int food_reserves = 0;
     public int food_keep_reserves = 10;
@@ -22,7 +23,7 @@ public class MeepleBahaviourScript : MonoBehaviour
     public int hunger = 0;
     public int happiness = 50;
 
-    public float age = 0;
+    public float age;
 
     System.Random random = new System.Random();
 
@@ -36,6 +37,20 @@ public class MeepleBahaviourScript : MonoBehaviour
 
         food_sell_willingnes = random.Next(0, 9); // demand 10 food to be x gold to sell
         food_buy_willingnes = random.Next(1, 9); // demand to get x food for 10 gold
+
+        List<string> inputs = new List<string>();
+        List<string> outputs = new List<string>();
+
+        inputs.Add("Food Reserves");
+        inputs.Add("Hunger");
+        inputs.Add("Age");
+
+        outputs.Add("Go eat");
+        outputs.Add("Do nothing");
+        outputs.Add("Gather");
+
+        print("");
+        brain = new NeuralNetwork( inputs, outputs );
     }
 
     // Update is called once per frame
@@ -45,70 +60,25 @@ public class MeepleBahaviourScript : MonoBehaviour
         hunger += 5;
         age += 0.25f;
 
-        // if too hungry or unhappy, die
-        if( hunger >= 100 || happiness <= 0)
+        // 1. Set inputs
+        brain.Set_input_node_intensity("Food Reserves", food_reserves);
+        brain.Set_input_node_intensity("Hunger", hunger);
+        brain.Set_input_node_intensity("Ages", age);
+
+        // 2. Fire network
+        brain.Fire_Network();
+
+        // 3. Get outputs
+        if( brain.get_output_node_intensity("Go eat") >= 0.8)
         {
-            die();
+            consume_meal();
+        }
+        if( brain.get_output_node_intensity("Gather") >= 0.8)
+        {
+            gather_food();
         }
 
-        // consume food if hungry
-        if( hunger > 50)
-        {
-            // if can, consume meal, else buy food, else gather food
-            if( consume_meal() )
-            {
-                change_happiness(5);
-                return;
-            } else
-            {
-                // if has the gold, buy the food, else gather it.
-                if( gold_reserves >= 10 && food_sell_willingnes <= WAIS.simple_market_food.get_r2g())
-                {
-                    gold_reserves -= 10;
-                    food_reserves += WAIS.simple_market_food.Buy();
-                    return;
-                } else
-                {
-                    gather_food();
-                    change_happiness(-5);
-                    return;
-                }
-            }
-        // if not hungry and food reserves low, gather food anyway.
-        } else if( food_reserves < food_keep_reserves)
-        {
-            food_reserves += WAIS.gather_food();
-            return;
-        }
 
-        /*
-        // if happy, duplicate
-        if( happiness >= 75)
-        {
-            happiness = 25;
-            WAIS.generate_meeple();
-            return;
-        }
-        */
-
-        // if has done nothing this tick, sell food
-        if( food_reserves > 10 && food_sell_willingnes <= WAIS.simple_market_food.get_r2g())
-        {
-            food_reserves -= 10;
-            gold_reserves += WAIS.simple_market_food.Sell();
-            return;
-        }
-        if( wood_reserves >= 10)
-        {
-            wood_reserves -= 10;
-            gold_reserves += WAIS.simple_market_wood.Sell();
-            return;
-        } else
-        {
-            gather_wood();
-            change_happiness(-1);
-            return;
-        }
     }
 
     bool consume_meal()

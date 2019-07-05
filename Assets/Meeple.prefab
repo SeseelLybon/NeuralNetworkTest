@@ -43,9 +43,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2acdccf85036e0b4d9177c32f110ad59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meeple_group: {fileID: 0}
-  meeple_prefab: {fileID: 4111033999277549315}
+  brain: {fileID: 0}
   food_reserves: 0
+  food_keep_reserves: 10
+  food_sell_willingnes: 0
+  food_buy_willingnes: 0
+  wood_reserves: 0
+  wood_keep_reserves: 0
+  wood_sell_willingnes: 0
+  wood_buy_willingnes: 0
   gold_reserves: 0
   hunger: 0
   happiness: 50
+  age: 0

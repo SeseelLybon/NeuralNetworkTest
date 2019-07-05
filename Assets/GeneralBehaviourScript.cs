@@ -42,9 +42,6 @@ public class GeneralBehaviourScript : MonoBehaviour
         simple_market_wood = new simple_Market(resources["Wood"]);
 
         generate_meeple();
-        generate_meeple();
-        generate_meeple();
-        generate_meeple();
 
     }
 
