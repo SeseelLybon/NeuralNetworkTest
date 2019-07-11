@@ -45,14 +45,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brain: {fileID: 0}
-  food_reserves: 0
+  food_reserves: 656
   food_keep_reserves: 10
-  food_sell_willingnes: 0
-  food_buy_willingnes: 0
   wood_reserves: 0
   wood_keep_reserves: 0
-  wood_sell_willingnes: 0
-  wood_buy_willingnes: 0
   gold_reserves: 0
   hunger: 0
   happiness: 50
@@ -78,16 +74,44 @@ MonoBehaviour:
     intensity: 0
     weights: []
     has_changed: 0
-  output_layer:
   - bias: 0
     intensity: 0
+    weights: []
+    has_changed: 0
+  - bias: 0
+    intensity: 0
+    weights: []
+    has_changed: 0
+  output_layer:
+  - bias: -60
+    intensity: 0
     weights:
+    - 0
+    - 0
     - 1
-    - 1
+    - 0
+    has_changed: 0
+  - bias: 20
+    intensity: 0
+    weights:
+    - -1
+    - 0
+    - 0
+    - 0
     has_changed: 0
   - bias: 0
     intensity: 0
     weights:
-    - 1
-    - 1
+    - 0
+    - 0
+    - 0
+    - 0
+    has_changed: 0
+  - bias: 0
+    intensity: 0
+    weights:
+    - 0
+    - 0
+    - 0
+    - 0
     has_changed: 0

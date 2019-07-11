@@ -10,13 +10,9 @@ public class MeepleBahaviourScript : MonoBehaviour
 
     public int food_reserves = 0;
     public int food_keep_reserves = 10;
-    public int food_sell_willingnes;
-    public int food_buy_willingnes;
 
     public int wood_reserves = 0;
     public int wood_keep_reserves = 0;
-    public int wood_sell_willingnes;
-    public int wood_buy_willingnes;
 
     public int gold_reserves = 0;
 
@@ -35,11 +31,6 @@ public class MeepleBahaviourScript : MonoBehaviour
 
         hunger = random.Next(0,30);
         happiness = random.Next(25, 75);
-
-        food_sell_willingnes = random.Next(0, 9); // demand 10 food to be x gold to sell
-        food_buy_willingnes = random.Next(1, 9); // demand to get x food for 10 gold
-
-
     }
 
     // Update is called once per frame
@@ -51,19 +42,29 @@ public class MeepleBahaviourScript : MonoBehaviour
 
         // 1. Set inputs
         brain.set_input_intensity(0, food_reserves);
-        brain.set_input_intensity(1, hunger);
+        brain.set_input_intensity(1, wood_reserves);
+        brain.set_input_intensity(2, hunger);
+        brain.set_input_intensity(3, age);
 
         // 2. Fire network
         brain.Fire_network();
 
         // 3. Get outputs
-        if( brain.get_output_intensity(0) >= 0.8)
+        if( brain.get_output_intensity(0) >= 0.5)
         {
             consume_meal();
         }
-        if( brain.get_output_intensity(0) >= 0.8)
+        if( brain.get_output_intensity(1) >= 0.5)
         {
             gather_food();
+        }
+        if (brain.get_output_intensity(2) >= 0.5)
+        {
+            gather_wood();
+        }
+        if (brain.get_output_intensity(3) >= 0.5)
+        {
+            //
         }
 
 
