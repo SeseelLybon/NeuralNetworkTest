@@ -9,10 +9,8 @@ public class MeepleBahaviourScript : MonoBehaviour
     public NeuralNetwork brain;
 
     public int food_reserves = 0;
-    public int food_keep_reserves = 10;
 
     public int wood_reserves = 0;
-    public int wood_keep_reserves = 0;
 
     public int gold_reserves = 0;
 
@@ -37,8 +35,14 @@ public class MeepleBahaviourScript : MonoBehaviour
     // 4 steps/update is 1 day
     void FixedUpdate()
     {
-        hunger += 5;
         age += 0.25f;
+
+        hunger += 5;
+        hunger = (hunger > 100) ? 100 : hunger;
+        hunger = (hunger < 0) ? 0 : hunger;
+
+        happiness = (happiness > 100) ? 100 : happiness;
+        happiness = (happiness < 0 ) ? 0 : happiness;
 
         // 1. Set inputs
         brain.set_input_intensity(0, food_reserves);
@@ -50,19 +54,19 @@ public class MeepleBahaviourScript : MonoBehaviour
         brain.Fire_network();
 
         // 3. Get outputs
-        if( brain.get_output_intensity(0) >= 0.5)
-        {
-            consume_meal();
-        }
-        if( brain.get_output_intensity(1) >= 0.5)
+        if (brain.get_output_intensity(1) >= 0.5)
         {
             gather_food();
         }
-        if (brain.get_output_intensity(2) >= 0.5)
+        else if (brain.get_output_intensity(0) >= 0.5)
+        {
+            consume_meal();
+        }
+        else if (brain.get_output_intensity(2) >= 0.5)
         {
             gather_wood();
         }
-        if (brain.get_output_intensity(3) >= 0.5)
+        else if (brain.get_output_intensity(3) >= 0.5)
         {
             //
         }
@@ -76,6 +80,7 @@ public class MeepleBahaviourScript : MonoBehaviour
         {
             food_reserves -= 5;
             hunger -= 20;
+            happiness+=5;
             return true;
         } else
         {
@@ -87,11 +92,19 @@ public class MeepleBahaviourScript : MonoBehaviour
     {
         food_reserves += WAIS.gather_food();
         hunger += 5;
+        if(hunger >= 75)
+        {
+            happiness -= 5;
+        } else
+        {
+            happiness -= 2;
+        }
     }
 
     void gather_wood()
     {
         wood_reserves += WAIS.gather_wood();
         hunger += 5;
+        happiness -= 2;
     }
 }

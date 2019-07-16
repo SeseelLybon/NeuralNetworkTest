@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brain: {fileID: 0}
-  food_reserves: 656
+  food_reserves: 0
   food_keep_reserves: 10
   wood_reserves: 0
   wood_keep_reserves: 0
@@ -99,11 +99,11 @@ MonoBehaviour:
     - 0
     - 0
     has_changed: 0
-  - bias: 0
+  - bias: 100
     intensity: 0
     weights:
     - 0
-    - 0
+    - -1
     - 0
     - 0
     has_changed: 0

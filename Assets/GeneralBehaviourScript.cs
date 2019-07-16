@@ -41,7 +41,10 @@ public class GeneralBehaviourScript : MonoBehaviour
         simple_market_food = new simple_Market(resources["Food"]);
         simple_market_wood = new simple_Market(resources["Wood"]);
 
-        generate_meeple();
+        for(int i = 0; i< 40; i++)
+        {
+            generate_meeple();
+        }
 
     }
 
